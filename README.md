@@ -1,7 +1,7 @@
 # BeepPool-Windows-Miner
 A small GUI for entering the required parameters for starting the miner for BeepPool
 
-![alt text](https://raw.githubusercontent.com/rr222cy/BeepPool-Windows-Miner/master/SubtractiveBeepPoolMiner.png)
+![alt text](SubtractiveBeepPoolMiner.png)
 
 Subtractive's BeepPool Windows Miner, based on the packages provided by Beep on: https://beeppool.org/downloads.html
 
