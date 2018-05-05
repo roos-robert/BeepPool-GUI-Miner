@@ -10,3 +10,5 @@ This is a GUI for entering your wallet, set the amount of cores you want to use 
 Download .zip, unzip and start BeePool-Windows-Miner.exe. Enter your settings and hit the start mining button and that's it. On restart your settings will be pre-filled.
 
 Requirements: .NET Framework 4.6 or newer
+
+Beer fund: *NQ78 BH7J NYMJ 0G1F 3DLP LFC4 DULQ AEH9 H7GM* 😁
