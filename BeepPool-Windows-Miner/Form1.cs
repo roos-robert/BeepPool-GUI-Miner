@@ -53,5 +53,11 @@ namespace BeepPool_Windows_Miner
                 bw.Close();
             }
         }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            ProcessStartInfo sInfo = new ProcessStartInfo("https://beeppool.org/");
+            Process.Start(sInfo);
+        }
     }
 }
