@@ -53,12 +53,21 @@ namespace BeepPool_Windows_Miner
                 bw.WriteLine(worker);
                 bw.Close();
             }
+
+            button2.Enabled = true;
+            button1.Enabled = false;
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
             ProcessStartInfo sInfo = new ProcessStartInfo("https://beeppool.org/");
             Process.Start(sInfo);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            consoleControl1.StopProcess();
+            button1.Enabled = true;
         }
     }
 }
