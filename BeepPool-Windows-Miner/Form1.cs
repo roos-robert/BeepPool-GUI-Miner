@@ -44,6 +44,7 @@ namespace BeepPool_Windows_Miner
             startInfo.FileName = @"miner.exe";
             startInfo.Arguments = String.Format("miner --miner={0} --wallet-address=\"{1}\" --extra-data=\"{2}\"", cores, wallet, worker);
             Process.Start(startInfo);
+            consoleControl1.StartProcess(startInfo.FileName, startInfo.Arguments);           
 
             using (StreamWriter bw = new StreamWriter(File.Create("settings.txt")))
             {

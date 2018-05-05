@@ -39,6 +39,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.consoleControl1 = new ConsoleControl.ConsoleControl();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -133,11 +134,23 @@
             this.pictureBox1.TabStop = false;
             this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
+            // consoleControl1
+            // 
+            this.consoleControl1.IsInputEnabled = true;
+            this.consoleControl1.Location = new System.Drawing.Point(456, 13);
+            this.consoleControl1.Name = "consoleControl1";
+            this.consoleControl1.SendKeyboardCommandsToProcess = false;
+            this.consoleControl1.ShowDiagnostics = false;
+            this.consoleControl1.Size = new System.Drawing.Size(610, 366);
+            this.consoleControl1.TabIndex = 10;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(433, 391);
+            this.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.ClientSize = new System.Drawing.Size(1078, 391);
+            this.Controls.Add(this.consoleControl1);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.button1);
@@ -169,6 +182,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private ConsoleControl.ConsoleControl consoleControl1;
     }
 }
 
