@@ -103,7 +103,7 @@
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(405, 24);
             this.label4.TabIndex = 6;
-            this.label4.Text = "BeepPool Windows Miner (unofficial) 0.0.1";
+            this.label4.Text = "BeepPool Windows Miner (unofficial) 0.0.2";
             // 
             // button1
             // 
