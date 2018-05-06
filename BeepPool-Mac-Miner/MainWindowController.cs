@@ -12,6 +12,7 @@ namespace BeepPool_Mac_Miner
 	public partial class MainWindowController : NSWindowController
 	{
 		static Process process;
+		static string minerCli;
 
 		// Called when created from unmanaged code
 		public MainWindowController(IntPtr handle) : base(handle)
@@ -36,7 +37,7 @@ namespace BeepPool_Mac_Miner
 		void Initialize()
 		{
 		}
-		
+
 		[Export("awakeFromNib")]
 		public void AwakeFromNib()
 		{
@@ -44,28 +45,44 @@ namespace BeepPool_Mac_Miner
 			{
 				string[] lines = System.IO.File.ReadAllLines(@"settings.txt");
 
-				if (lines.Length == 3)
+				if (lines.Length == 4)
 				{
 					textBox3.StringValue = lines[0];
 					textBox1.StringValue = lines[1];
 					textBox2.StringValue = lines[2];
+					minerCli = lines[3];
 				}
 			}
 			catch
 			{
 
 			}
+
+			consoleControl1.Font = NSFont.FromFontName("Courier", 11);
 		}
 
 		partial void button1_Click(NSButton sender)
 		{
+			if (string.IsNullOrEmpty(minerCli))
+			{
+				var openPanel = NSOpenPanel.OpenPanel;
+
+				openPanel.BeginSheet(Window, (result) =>
+				{
+					if (openPanel.Url != null)
+					{
+						minerCli = openPanel.Url.Path;
+					}
+				});
+			}
+
 			var wallet = textBox3.StringValue;
 			var cores = textBox1.StringValue;
 			var worker = textBox2.StringValue;
 
 			var startInfo = new ProcessStartInfo
 			{
-				FileName = "miner",
+				FileName = minerCli,
 				Arguments = String.Format("--miner={0} --wallet-address=\"{1}\" --extra-data=\"{2}\"", cores, wallet, worker),
 				UseShellExecute = false,
 				CreateNoWindow = true,
@@ -74,23 +91,34 @@ namespace BeepPool_Mac_Miner
 				ErrorDialog = false
 			};
 
-			process = Process.Start(startInfo);
-
-			process.OutputDataReceived += console_outputReceived;
-			process.ErrorDataReceived += console_outputReceived;
-
-			process.BeginOutputReadLine();
-			process.BeginErrorReadLine();
-
-			using (StreamWriter bw = new StreamWriter(File.Create("settings.txt")))
+			try
 			{
-				bw.WriteLine(wallet);
-				bw.WriteLine(cores);
-				bw.WriteLine(worker);
-			}
+				process = Process.Start(startInfo);
 
-			button2.Enabled = true;
-			button1.Enabled = false;
+				process.OutputDataReceived += console_outputReceived;
+				process.ErrorDataReceived += console_outputReceived;
+				process.EnableRaisingEvents = true;
+				process.Exited += console_exited;
+
+				process.BeginOutputReadLine();
+				process.BeginErrorReadLine();
+
+				using (StreamWriter bw = new StreamWriter(File.Create("settings.txt")))
+				{
+					bw.WriteLine(wallet);
+					bw.WriteLine(cores);
+					bw.WriteLine(worker);
+					bw.WriteLine(minerCli);
+				}
+
+				button2.Enabled = true;
+				button1.Enabled = false;
+			}
+			catch
+			{
+				consoleControl1.TextStorage.MutableString.Append((NSString)($"Error: Could not find CLI miner at path '{minerCli}'" + Environment.NewLine));
+				consoleControl1.ScrollRangeToVisible(new NSRange(consoleControl1.String.Length, 0));
+			}
 		}
 
 		partial void pictureBox1_Click(NSButton sender)
@@ -117,6 +145,15 @@ namespace BeepPool_Mac_Miner
 			}
 		}
 
+		void console_exited(object sender, EventArgs e)
+		{
+			InvokeOnMainThread(() =>
+			{
+				button2.Enabled = false;
+				button1.Enabled = true;
+			});
+		}
+
 		//strongly typed window accessor
 		public new MainWindow Window
 		{
@@ -125,7 +162,5 @@ namespace BeepPool_Mac_Miner
 				return (MainWindow)base.Window;
 			}
 		}
-
-		public bool InvokeRequired => throw new NotImplementedException();
 	}
 }
