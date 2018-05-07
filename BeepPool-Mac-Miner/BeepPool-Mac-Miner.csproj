@@ -11,8 +11,7 @@
     <RootNamespace>BeepPool_Mac_Miner</RootNamespace>
     <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
     <AssemblyName>BeepPool_Mac_Miner</AssemblyName>
-    <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <UseXamMacFullFramework>true</UseXamMacFullFramework>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>True</DebugSymbols>
@@ -33,6 +32,7 @@
     <PackageSigningKey>Developer ID Installer</PackageSigningKey>
     <I18n />
     <HttpClientHandler>NSUrlSessionHandler</HttpClientHandler>
+    <AOTMode>None</AOTMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
@@ -41,7 +41,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <IncludeMonoRuntime>False</IncludeMonoRuntime>
-    <LinkMode>Full</LinkMode>
+    <LinkMode>None</LinkMode>
     <PlatformTarget>x86</PlatformTarget>
     <EnablePackageSigning>False</EnablePackageSigning>
     <ConsolePause>False</ConsolePause>
@@ -50,6 +50,7 @@
     <CodeSigningKey>Mac Developer</CodeSigningKey>
     <UseSGen>False</UseSGen>
     <HttpClientHandler>NSUrlSessionHandler</HttpClientHandler>
+    <AOTMode>None</AOTMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|x86' ">
     <DebugType>none</DebugType>
@@ -60,7 +61,7 @@
     <IncludeMonoRuntime>True</IncludeMonoRuntime>
     <PackageSigningKey>3rd Party Mac Developer Installer</PackageSigningKey>
     <PlatformTarget>x86</PlatformTarget>
-    <LinkMode>Full</LinkMode>
+    <LinkMode>None</LinkMode>
     <EnableCodeSigning>True</EnableCodeSigning>
     <ConsolePause>False</ConsolePause>
     <EnablePackageSigning>True</EnablePackageSigning>
@@ -68,6 +69,7 @@
     <CodeSigningKey>3rd Party Mac Developer Application</CodeSigningKey>
     <UseSGen>False</UseSGen>
     <HttpClientHandler>NSUrlSessionHandler</HttpClientHandler>
+    <AOTMode>None</AOTMode>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

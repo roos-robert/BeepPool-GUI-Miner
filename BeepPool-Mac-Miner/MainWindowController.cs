@@ -3,16 +3,27 @@ using Foundation;
 using AppKit;
 using System.IO;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using CoreGraphics;
+using System.Collections.Generic;
 
 namespace BeepPool_Mac_Miner
 {
 	public partial class MainWindowController : NSWindowController
 	{
-		static Process process;
+		static Process minerProcess;
 		static string minerCli;
+
+		//strongly typed window accessor
+		public new MainWindow Window
+		{
+			get
+			{
+				return (MainWindow)base.Window;
+			}
+		}
 
 		// Called when created from unmanaged code
 		public MainWindowController(IntPtr handle) : base(handle)
@@ -39,7 +50,7 @@ namespace BeepPool_Mac_Miner
 		}
 
 		[Export("awakeFromNib")]
-		public void AwakeFromNib()
+		public override void AwakeFromNib()
 		{
 			try
 			{
@@ -55,7 +66,7 @@ namespace BeepPool_Mac_Miner
 			}
 			catch
 			{
-
+				PrintToConsoleOutput($"Error: Could not find 'settings.txt'");
 			}
 
 			consoleControl1.Font = NSFont.FromFontName("Courier", 11);
@@ -93,15 +104,15 @@ namespace BeepPool_Mac_Miner
 
 			try
 			{
-				process = Process.Start(startInfo);
+				minerProcess = Process.Start(startInfo);
 
-				process.OutputDataReceived += console_outputReceived;
-				process.ErrorDataReceived += console_outputReceived;
-				process.EnableRaisingEvents = true;
-				process.Exited += console_exited;
+				minerProcess.OutputDataReceived += console_outputReceived;
+				minerProcess.ErrorDataReceived += console_outputReceived;
+				minerProcess.EnableRaisingEvents = true;
+				minerProcess.Exited += console_exited;
 
-				process.BeginOutputReadLine();
-				process.BeginErrorReadLine();
+				minerProcess.BeginOutputReadLine();
+				minerProcess.BeginErrorReadLine();
 
 				using (StreamWriter bw = new StreamWriter(File.Create("settings.txt")))
 				{
@@ -111,13 +122,15 @@ namespace BeepPool_Mac_Miner
 					bw.WriteLine(minerCli);
 				}
 
-				button2.Enabled = true;
 				button1.Enabled = false;
+				button2.Enabled = true;
+				textBox3.Enabled = false;
+				textBox1.Enabled = false;
+				textBox2.Enabled = false;
 			}
 			catch
 			{
-				consoleControl1.TextStorage.MutableString.Append((NSString)($"Error: Could not find CLI miner at path '{minerCli}'" + Environment.NewLine));
-				consoleControl1.ScrollRangeToVisible(new NSRange(consoleControl1.String.Length, 0));
+				PrintToConsoleOutput($"Error: Could not find CLI miner at path '{minerCli}'");
 			}
 		}
 
@@ -128,9 +141,15 @@ namespace BeepPool_Mac_Miner
 
 		partial void button2_Click(NSButton sender)
 		{
-			process?.Kill();
-			button2.Enabled = false;
+			if (minerProcess != null && !minerProcess.HasExited)
+			{
+				KillProcessTree(minerProcess);
+			}
 			button1.Enabled = true;
+			button2.Enabled = false;
+			textBox3.Enabled = true;
+			textBox1.Enabled = true;
+			textBox2.Enabled = true;
 		}
 
 		void console_outputReceived(object sender, DataReceivedEventArgs e)
@@ -139,8 +158,7 @@ namespace BeepPool_Mac_Miner
 			{
 				InvokeOnMainThread(() =>
 				{
-					consoleControl1.TextStorage.MutableString.Append((NSString)(e.Data + Environment.NewLine));
-					consoleControl1.ScrollRangeToVisible(new NSRange(consoleControl1.String.Length, 0));
+					PrintToConsoleOutput(e.Data);
 				});
 			}
 		}
@@ -154,13 +172,38 @@ namespace BeepPool_Mac_Miner
 			});
 		}
 
-		//strongly typed window accessor
-		public new MainWindow Window
+		static void KillProcessTree(Process process)
 		{
-			get
+			var startInfo = new ProcessStartInfo
 			{
-				return (MainWindow)base.Window;
+				FileName = "bash",
+				Arguments = String.Format("-c \"ps -ef | grep {0} | grep -v grep | awk '{{print $2}}' | grep -v {0}\"", process.Id),
+				UseShellExecute = false,
+				CreateNoWindow = true,
+				RedirectStandardOutput = true,
+				ErrorDialog = false
+			};
+
+			var p = Process.Start(startInfo);
+			p.Start();
+			p.WaitForExit();
+			string output = p.StandardOutput.ReadToEnd();
+			p.WaitForExit();
+
+			var split = output.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+			var subprocessIds = Array.ConvertAll(split, s => int.Parse(s));
+
+			foreach (var subprocessId in subprocessIds)
+			{
+				KillProcessTree(Process.GetProcessById(subprocessId));
 			}
+			process.Kill();
+		}
+
+		void PrintToConsoleOutput(string message)
+		{
+			consoleControl1.TextStorage.MutableString.Append((NSString)(message + Environment.NewLine));
+			consoleControl1.ScrollRangeToVisible(new NSRange(consoleControl1.String.Length, 0));
 		}
 	}
 }
