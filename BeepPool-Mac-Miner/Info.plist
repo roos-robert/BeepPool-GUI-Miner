@@ -4,10 +4,6 @@
 <dict>
 	<key>CFBundleIconFile</key>
 	<string>grumpycat.icns</string>
-	<key>CFBundleIconFiles</key>
-	<array>
-		<string>grumpycat.icns</string>
-	</array>
 	<key>CFBundleIdentifier</key>
 	<string>com.nimiq.beeppool-mac-miner</string>
 	<key>CFBundleName</key>
@@ -20,5 +16,9 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.0.1</string>
+	<key>XSAppIconAssets</key>
+	<string>Resources/Images.xcassets/AppIcon.appiconset</string>
 </dict>
 </plist>

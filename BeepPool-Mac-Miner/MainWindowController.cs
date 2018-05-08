@@ -3,11 +3,6 @@ using Foundation;
 using AppKit;
 using System.IO;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.ComponentModel;
-using CoreGraphics;
-using System.Collections.Generic;
 
 namespace BeepPool_Mac_Miner
 {
@@ -15,6 +10,7 @@ namespace BeepPool_Mac_Miner
 	{
 		static Process minerProcess;
 		static string minerCli;
+		static bool mining;
 
 		//strongly typed window accessor
 		public new MainWindow Window
@@ -64,8 +60,9 @@ namespace BeepPool_Mac_Miner
 					minerCli = lines[3];
 				}
 			}
-			catch
+			catch (Exception e)
 			{
+				Debug.WriteLine(e.Message);
 				PrintToConsoleOutput($"Error: Could not find 'settings.txt'");
 			}
 
@@ -83,17 +80,71 @@ namespace BeepPool_Mac_Miner
 					if (openPanel.Url != null)
 					{
 						minerCli = openPanel.Url.Path;
+						StartMining();
 					}
 				});
 			}
+			else
+			{
+				StartMining();
+			}
+		}
 
+		partial void button2_Click(NSButton sender)
+		{
+			StopMining();
+		}
+
+		partial void pictureBox1_Click(NSButton sender)
+		{
+			NSWorkspace.SharedWorkspace.OpenUrl(new NSUrl("https://beeppool.org/"));
+		}
+
+		void console_outputReceived(object sender, DataReceivedEventArgs e)
+		{
+			if (e.Data != null)
+			{
+				InvokeOnMainThread(() =>
+				{
+					if (!mining)
+					{
+						if (!minerProcess.HasExited)
+						{
+							minerProcess.WaitForExit(500);
+						}
+
+						if (!minerProcess.HasExited)
+						{
+							PrintToConsoleOutput($"Started mining...");
+						}
+
+						mining = true;
+					}
+					PrintToConsoleOutput(e.Data);
+				});
+			}
+		}
+
+		void console_exited(object sender, EventArgs e)
+		{
+			InvokeOnMainThread(() =>
+			{
+				StopMining();
+			});
+		}
+
+		void StartMining()
+		{
 			var wallet = textBox3.StringValue;
 			var cores = textBox1.StringValue;
 			var worker = textBox2.StringValue;
 
+			var workingDirectory = Path.GetDirectoryName(minerCli);
+
 			var startInfo = new ProcessStartInfo
 			{
 				FileName = minerCli,
+				WorkingDirectory = workingDirectory,
 				Arguments = String.Format("--miner={0} --wallet-address=\"{1}\" --extra-data=\"{2}\"", cores, wallet, worker),
 				UseShellExecute = false,
 				CreateNoWindow = true,
@@ -101,6 +152,7 @@ namespace BeepPool_Mac_Miner
 				RedirectStandardError = true,
 				ErrorDialog = false
 			};
+			startInfo.Environment["PATH"] = "/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin";
 
 			try
 			{
@@ -128,48 +180,30 @@ namespace BeepPool_Mac_Miner
 				textBox1.Enabled = false;
 				textBox2.Enabled = false;
 			}
-			catch
+			catch (Exception e)
 			{
+				Debug.WriteLine(e.Message);
 				PrintToConsoleOutput($"Error: Could not find CLI miner at path '{minerCli}'");
 			}
 		}
 
-		partial void pictureBox1_Click(NSButton sender)
+		void StopMining()
 		{
-			NSWorkspace.SharedWorkspace.OpenUrl(new NSUrl("https://beeppool.org/"));
-		}
-
-		partial void button2_Click(NSButton sender)
-		{
-			if (minerProcess != null && !minerProcess.HasExited)
+			if (mining)
 			{
-				KillProcessTree(minerProcess);
+				mining = false;
+				
+				if (minerProcess != null && !minerProcess.HasExited)
+				{
+					KillProcessTree(minerProcess);
+					PrintToConsoleOutput($"Stopped mining.");
+				}
 			}
 			button1.Enabled = true;
 			button2.Enabled = false;
 			textBox3.Enabled = true;
 			textBox1.Enabled = true;
 			textBox2.Enabled = true;
-		}
-
-		void console_outputReceived(object sender, DataReceivedEventArgs e)
-		{
-			if (e.Data != null)
-			{
-				InvokeOnMainThread(() =>
-				{
-					PrintToConsoleOutput(e.Data);
-				});
-			}
-		}
-
-		void console_exited(object sender, EventArgs e)
-		{
-			InvokeOnMainThread(() =>
-			{
-				button2.Enabled = false;
-				button1.Enabled = true;
-			});
 		}
 
 		static void KillProcessTree(Process process)

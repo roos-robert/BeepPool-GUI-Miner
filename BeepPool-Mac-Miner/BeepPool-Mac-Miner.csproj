@@ -33,6 +33,7 @@
     <I18n />
     <HttpClientHandler>NSUrlSessionHandler</HttpClientHandler>
     <AOTMode>None</AOTMode>
+    <AssemblyName>BeePool-Mac-Miner</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
@@ -51,6 +52,7 @@
     <UseSGen>False</UseSGen>
     <HttpClientHandler>NSUrlSessionHandler</HttpClientHandler>
     <AOTMode>None</AOTMode>
+    <AssemblyName>BeepPool-Mac-Miner</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|x86' ">
     <DebugType>none</DebugType>
@@ -99,7 +101,17 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="settings.txt" />
-    <Content Include="3a552d813ee0d557c9f4ac607834f1cc.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ImageAsset Include="Resources\Images.xcassets\AppIcon.appiconset\3a552d813ee0d557c9f4ac607834f1cc-7.png" />
+    <ImageAsset Include="Resources\Images.xcassets\AppIcon.appiconset\Contents.json" />
+    <ImageAsset Include="Resources\Images.xcassets\Contents.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\Images.xcassets\" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\BeepPool.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>
