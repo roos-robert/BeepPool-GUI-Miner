@@ -50,7 +50,7 @@ namespace BeepPool_Mac_Miner
 		{
 			try
 			{
-				string[] lines = System.IO.File.ReadAllLines(@"settings.txt");
+				string[] lines = File.ReadAllLines("settings.txt");
 
 				if (lines.Length == 4)
 				{
@@ -63,10 +63,15 @@ namespace BeepPool_Mac_Miner
 			catch (Exception e)
 			{
 				Debug.WriteLine(e.Message);
-				PrintToConsoleOutput($"Error: Could not find 'settings.txt'");
+				PrintToConsoleOutput($"Could not find 'settings.txt'");
 			}
 
 			consoleControl1.Font = NSFont.FromFontName("Courier", 11);
+
+			Window.WillClose += (sender, e) =>
+			{
+				StopMining();
+			};
 		}
 
 		partial void button1_Click(NSButton sender)
@@ -192,7 +197,7 @@ namespace BeepPool_Mac_Miner
 			if (mining)
 			{
 				mining = false;
-				
+
 				if (minerProcess != null && !minerProcess.HasExited)
 				{
 					KillProcessTree(minerProcess);
