@@ -1,4 +1,4 @@
-# BeepPool-Miner
+# BeepPool-GUI-Miner
 A small GUI for entering the required parameters for starting the miner for BeepPool
 
 BeepPool Windows Miner, based on the packages provided by Beep on: https://beeppool.org/downloads.html
