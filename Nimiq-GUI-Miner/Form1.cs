@@ -76,5 +76,10 @@ namespace Nimiq_GUI_Miner
 			textBox1.Enabled = true;
 			textBox2.Enabled = true;
 		}
-	}
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            consoleControl1.StopProcess();
+        }
+    }
 }
